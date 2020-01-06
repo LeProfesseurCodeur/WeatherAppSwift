@@ -7,8 +7,12 @@
 //
 
 import UIKit
+import Alamofire
+import SwiftyJSON
+import NVActivityIndicatorView
+import CoreLocation
 
-class ViewController: UIViewController {
+class ViewController: UIViewController, CLLocationManagerDelegate {
 
     @IBOutlet weak var locationLabel: UILabel!
     @IBOutlet weak var dayLabel: UILabel!
@@ -19,9 +23,33 @@ class ViewController: UIViewController {
     
     let gradientLayer = CAGradientLayer()
     
+    let apiKey = "444dc5be38a2a9c73ba8dd9d3ec62e3e"
+    
+    let lat = 11.344533
+    let lon = 104.33322
+    
+    var activityIndicator: NVActivityIndicatorView!
+    let locationManager = CLLocationManager()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         backgroundView.layer.addSublayer(gradientLayer)
+        
+        let indicatorSize: CGFloat = 70
+        let indicatorFrame = CGRect(x: (view.frame.width-indicatorSize)/2, y: (view.frame.height-indicatorSize)/2, width: indicatorSize, height: indicatorSize)
+        activityIndicator = NVActivityIndicatorView(frame: indicatorFrame, type: .lineScale, color: UIColor.white, padding: 20.0)
+        activityIndicator.backgroundColor = UIColor.black
+        view.addSubview(activityIndicator)
+        
+        locationManager.requestWhenInUseAuthorization()
+        
+        activityIndicator.startAnimating()
+        if (CLLocationManager.locationServicesEnabled()) {
+            locationManager.delegate = self
+            locationManager.desiredAccuracy = kCLLocationAccuracyBest
+            locationManager.startUpdatingHeading()
+        }
+        
     }
     
     override func viewWillAppear(_ animated: Bool) {
