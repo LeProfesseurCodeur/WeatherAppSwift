@@ -6,6 +6,7 @@
 //  Copyright © 2020 Dylan Luchmun. All rights reserved.
 //
 
+import Foundation
 import UIKit
 import Alamofire
 import SwiftyJSON
@@ -25,8 +26,8 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
     
     let apiKey = "444dc5be38a2a9c73ba8dd9d3ec62e3e"
     
-    let lat = 11.344533
-    let lon = 104.33322
+    var lat = 11.344533
+    var lon = 104.33322
     
     var activityIndicator: NVActivityIndicatorView!
     let locationManager = CLLocationManager()
@@ -55,6 +56,44 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
     override func viewWillAppear(_ animated: Bool) {
         setBlueGradientBackground()
         //setGreyGradientBackground()
+    }
+    
+    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+        let location = locations[0]
+        lat = location.coordinate.latitude
+        lon = location.coordinate.longitude
+        Alamofire.request("http://api.openweathermap.org/data/2.5/weather?lat=\(lat)&lon=\(lon)&appid=\(apiKey)&units=metric").responseJSON {
+            response in
+            self.activityIndicator.stopAnimating()
+            if let responseStr = response.result.value {
+                let jsonResponse = JSON(responseStr)
+                let jsonWeather = jsonResponse["weather"].array![0]
+                let jsonTemp = jsonResponse["main"]
+                let iconName = jsonWeather["icon"].stringValue
+            
+                self.locationLabel.text = jsonResponse["name"].stringValue
+                self.conditionImageView.image = UIImage(named: iconName)
+                self.conditionLabel.text = jsonWeather["main"].stringValue
+                self.temperatureLabel.text = "\(Int(round(jsonTemp["temp"].doubleValue)))"
+                
+                let date = Date()
+                let dateFormatter = DateFormatter()
+                dateFormatter.dateFormat = "EEEE"
+                self.dayLabel.text = dateFormatter.string(from: date)
+                
+                let suffix = iconName.suffix(1)
+                if(suffix == "n") {
+                    self.setGreyGradientBackground()
+                }else{
+                    self.setBlueGradientBackground()
+                }
+            }
+        }
+        self.locationManager.stopUpdatingLocation()
+    }
+    
+    func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
+        print(error.localizedDescription)
     }
     
     func setBlueGradientBackground() {
