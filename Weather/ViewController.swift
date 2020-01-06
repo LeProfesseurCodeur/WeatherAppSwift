@@ -17,18 +17,18 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
 
     @IBOutlet weak var locationLabel: UILabel!
     @IBOutlet weak var dayLabel: UILabel!
+    
     @IBOutlet weak var conditionImageView: UIImageView!
     @IBOutlet weak var conditionLabel: UILabel!
+    
     @IBOutlet weak var temperatureLabel: UILabel!
     @IBOutlet weak var backgroundView: UIView!
     
     let gradientLayer = CAGradientLayer()
     
     let apiKey = "444dc5be38a2a9c73ba8dd9d3ec62e3e"
-    
-    var lat = 11.344533
-    var lon = 104.33322
-    
+    var lat = 48.866667
+    var lon =  2.333333
     var activityIndicator: NVActivityIndicatorView!
     let locationManager = CLLocationManager()
     
@@ -45,17 +45,16 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
         locationManager.requestWhenInUseAuthorization()
         
         activityIndicator.startAnimating()
-        if (CLLocationManager.locationServicesEnabled()) {
+        if(CLLocationManager.locationServicesEnabled()){
             locationManager.delegate = self
             locationManager.desiredAccuracy = kCLLocationAccuracyBest
-            locationManager.startUpdatingHeading()
+            locationManager.startUpdatingLocation()
         }
         
     }
     
     override func viewWillAppear(_ animated: Bool) {
         setBlueGradientBackground()
-        //setGreyGradientBackground()
     }
     
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
@@ -70,7 +69,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
                 let jsonWeather = jsonResponse["weather"].array![0]
                 let jsonTemp = jsonResponse["main"]
                 let iconName = jsonWeather["icon"].stringValue
-            
+                
                 self.locationLabel.text = jsonResponse["name"].stringValue
                 self.conditionImageView.image = UIImage(named: iconName)
                 self.conditionLabel.text = jsonWeather["main"].stringValue
@@ -82,7 +81,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
                 self.dayLabel.text = dateFormatter.string(from: date)
                 
                 let suffix = iconName.suffix(1)
-                if(suffix == "n") {
+                if(suffix == "n"){
                     self.setGreyGradientBackground()
                 }else{
                     self.setBlueGradientBackground()
@@ -96,16 +95,16 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
         print(error.localizedDescription)
     }
     
-    func setBlueGradientBackground() {
+    func setBlueGradientBackground(){
         let topColor = UIColor(red: 95.0/255.0, green: 165.0/255.0, blue: 1.0, alpha: 1.0).cgColor
-        let bottomColor = UIColor(red: 72.0/255, green: 114.0/255.0, blue: 184.0/255.0, alpha: 1.0).cgColor
+        let bottomColor = UIColor(red: 72.0/255.0, green: 114.0/255.0, blue: 184.0/255.0, alpha: 1.0).cgColor
         gradientLayer.frame = view.bounds
         gradientLayer.colors = [topColor, bottomColor]
     }
     
-    func setGreyGradientBackground() {
+    func setGreyGradientBackground(){
         let topColor = UIColor(red: 151.0/255.0, green: 151.0/255.0, blue: 151.0/255.0, alpha: 1.0).cgColor
-        let bottomColor = UIColor(red: 72.0/255, green: 72.0/255.0, blue: 72.0/255.0, alpha: 1.0).cgColor
+        let bottomColor = UIColor(red: 72.0/255.0, green: 72.0/255.0, blue: 72.0/255.0, alpha: 1.0).cgColor
         gradientLayer.frame = view.bounds
         gradientLayer.colors = [topColor, bottomColor]
     }
